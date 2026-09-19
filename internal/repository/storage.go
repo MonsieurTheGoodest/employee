@@ -345,10 +345,10 @@ func (db *DataBase) CreateEmployee(
 	}
 
 	query = `
-		INSERT INTO pending_employees (first_name, last_name, department_id, id)
-		VALUES ($1, $2, $3, $4)
+		INSERT INTO pending_employees (employee_id)
+		VALUES ($1)
 	`
-	_, err = tx.Exec(ctx, query, emp.FirstName, emp.LastName, depID, id)
+	_, err = tx.Exec(ctx, query, id)
 
 	if err != nil {
 		return fmt.Errorf("creating pending_employee ERR: %w", err)
@@ -420,9 +420,10 @@ func (db *DataBase) PendingEmployees(
 ) (internal.EmployeesList, error) {
 
 	query := `
-		SELECT pending_employees.first_name, pending_employees.last_name, pending_employees.id, departments.department
-		FROM pending_employees 
-		JOIN departments ON pending_employees.department_id = departments.id
+		SELECT employees.first_name, employees.last_name, employees.id, departments.department
+		FROM pending_employees
+		JOIN employees ON pending_employees.employee_id = employees.id
+		JOIN departments ON employees.department_id = departments.id
 	`
 
 	rows, err := db.Pool.Query(ctx, query)
@@ -461,7 +462,7 @@ func (db *DataBase) PendingEmployees(
 	return convertToEmployeesList(fullEmp), nil
 }
 
-func (db *DataBase) changeStatus(ctx context.Context, emp internal.Employee) error {
+func (db *DataBase) changeStatus(ctx context.Context, id int) error {
 	checkedID, err := statusID(ctx, checked, db)
 	if err != nil {
 		return err
@@ -476,10 +477,10 @@ func (db *DataBase) changeStatus(ctx context.Context, emp internal.Employee) err
 	query := `
 		UPDATE employees
 		SET status_id = $1
-		WHERE first_name = $2 AND last_name = $3
+		WHERE id = $2
 	`
 
-	_, err = tx.Exec(ctx, query, checkedID, emp.FirstName, emp.LastName)
+	_, err = tx.Exec(ctx, query, checkedID, id)
 
 	if err != nil {
 		return fmt.Errorf("updating status ERR: %w", err)
@@ -487,10 +488,10 @@ func (db *DataBase) changeStatus(ctx context.Context, emp internal.Employee) err
 
 	query = `
 		DELETE FROM pending_employees
-		WHERE first_name = $1 AND last_name = $2 
+		WHERE id = $1
 	`
 
-	_, err = tx.Exec(ctx, query, emp.FirstName, emp.LastName)
+	_, err = tx.Exec(ctx, query, id)
 
 	if err != nil {
 		return fmt.Errorf("deleting employee ERR: %w", err)

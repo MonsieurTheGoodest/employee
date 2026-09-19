@@ -21,14 +21,11 @@ CREATE TABLE IF NOT EXISTS employees (
 );
 
 CREATE TABLE IF NOT EXISTS pending_employees (
-    id INT NOT NULL,
-    first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL,
+    id SERIAL PRIMARY KEY,
     creating_time TIMESTAMPTZ DEFAULT NOW(),
-    department_id INT NOT NULL,
+    employee_id INT,
 
-    CONSTRAINT department_id_fk FOREIGN KEY (department_id) REFERENCES departments (id),
-    UNIQUE (first_name, last_name) 
+    CONSTRAINT employee_id_fk FOREIGN KEY (employee_id) REFERENCES employees (id)
 );
 
 CREATE INDEX IF NOT EXISTS department_idx
