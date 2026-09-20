@@ -479,7 +479,7 @@ func (db *DataBase) changeStatus(ctx context.Context, id int) error {
 
 	query = `
 		DELETE FROM pending_employees
-		WHERE id = $1
+		WHERE employee_id = $1
 	`
 
 	_, err = tx.Exec(ctx, query, id)

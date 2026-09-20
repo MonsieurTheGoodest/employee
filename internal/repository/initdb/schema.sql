@@ -21,7 +21,6 @@ CREATE TABLE IF NOT EXISTS employees (
 );
 
 CREATE TABLE IF NOT EXISTS pending_employees (
-    id SERIAL PRIMARY KEY,
     creating_time TIMESTAMPTZ DEFAULT NOW(),
     employee_id INT,
 
