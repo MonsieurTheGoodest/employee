@@ -26,7 +26,7 @@ func main() {
 	defer db.Close()
 
 	go func() {
-		err := repository.Checking(db, cfg.CheckInterval, cfg.PendingTime)
+		err := repository.Checking(db, cfg.CheckInterval, cfg.PendingTimeInSeconds)
 
 		if err != nil {
 			log.Print(err)

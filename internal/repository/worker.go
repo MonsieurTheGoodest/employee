@@ -9,11 +9,11 @@ import (
 func Checking(
 	db *DataBase,
 	checkInterval time.Duration,
-	pendingTimeInSeconds time.Duration,
+	pendingTimeInSeconds int,
 ) error {
 
 	ctx, cancel := context.WithCancel(context.Background())
-	ticker := time.NewTicker(checkInterval)
+	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 	defer cancel()
 
@@ -25,6 +25,7 @@ func Checking(
 				FROM pending_employees 
 				WHERE creating_time < NOW() - $1 * INTERVAL '1 second'
 			`
+
 			rows, err := db.Pool.Query(ctx, query, pendingTimeInSeconds)
 			if err != nil {
 				return fmt.Errorf("worker ERR: selecting employees ERR: %w", err)

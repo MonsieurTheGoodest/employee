@@ -10,10 +10,10 @@ import (
 )
 
 type Config struct {
-	PendingTime   time.Duration `yaml:"pending_time"`
-	CheckInterval time.Duration `yaml:"check_interval"`
-	HTTPServer    `yaml:"http_server"`
-	Storage       `yaml:"storage"`
+	PendingTimeInSeconds int           `yaml:"pending_time_in_seconds"`
+	CheckInterval        time.Duration `yaml:"check_interval"`
+	HTTPServer           `yaml:"http_server"`
+	Storage              `yaml:"storage"`
 }
 
 type HTTPServer struct {
