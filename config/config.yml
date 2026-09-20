@@ -1,0 +1,14 @@
+http_server:
+    address: ":9000"
+    read_timeout: 10s
+    write_timeout: 10s
+    idle_timeout: 60s
+
+storage:
+    port: "5432"
+    user: postgres
+    db_name: postgres
+    host: postgres
+
+pending_time: 10s
+check_interval: 5s

@@ -4,11 +4,11 @@ WORKDIR /employee
 
 COPY ./cmd/ ./cmd/
 COPY ./internal/ ./internal/
+COPY ./config ./config
 COPY go.mod go.sum ./
 
-ENV POSTGRES_USER=postgres
-ENV POSTGRES_DB_NAME=postgres
-ENV HOST=postgres
+ENV INITDB_PATH=./internal/repository/initdb/schema.sql
+ENV CONFIG_PATH=./config/config.yml
 
 RUN go mod download
 

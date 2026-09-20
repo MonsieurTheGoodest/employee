@@ -2,16 +2,22 @@ package main
 
 import (
 	"context"
+	"employee/config"
 	"employee/internal/handler"
 	"employee/internal/repository"
 	"employee/internal/service"
 	"log"
 	"net/http"
-	"time"
 )
 
 func main() {
-	db, err := repository.NewDatabase(context.Background())
+	cfg, err := config.NewConfig()
+
+	if err != nil {
+		panic(err)
+	}
+
+	db, err := repository.NewDatabase(context.Background(), cfg.StorageURL())
 
 	if err != nil {
 		panic(err)
@@ -20,7 +26,7 @@ func main() {
 	defer db.Close()
 
 	go func() {
-		err := repository.Checking(db)
+		err := repository.Checking(db, cfg.CheckInterval, cfg.PendingTime)
 
 		if err != nil {
 			log.Print(err)
@@ -33,13 +39,8 @@ func main() {
 	mux := http.NewServeMux()
 	handler.RegisterRoutes(mux)
 
-	server := &http.Server{
-		Addr:         ":9000",
-		Handler:      mux,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  60 * time.Second,
-	}
+	server := cfg.HTTPServer.Server()
+	server.Handler = mux
 
 	log.Fatal(server.ListenAndServe())
 }

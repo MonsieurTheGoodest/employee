@@ -6,7 +6,12 @@ import (
 	"time"
 )
 
-func Checking(db *DataBase) error {
+func Checking(
+	db *DataBase,
+	checkInterval time.Duration,
+	pendingTimeInSeconds time.Duration,
+) error {
+
 	ctx, cancel := context.WithCancel(context.Background())
 	ticker := time.NewTicker(checkInterval)
 	defer ticker.Stop()

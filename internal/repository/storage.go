@@ -43,17 +43,8 @@ type DataBase struct {
 	Pool *pgxpool.Pool
 }
 
-func databaseURL() string {
-	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		os.Getenv("POSTGRES_USER"),
-		os.Getenv("POSTGRES_PASSWORD"),
-		os.Getenv("HOST"),
-		port,
-		os.Getenv("POSTGRES_DB_NAME"))
-}
-
-func NewDatabase(ctx context.Context) (*DataBase, error) {
-	config, err := pgxpool.ParseConfig(databaseURL())
+func NewDatabase(ctx context.Context, databaseURL string) (*DataBase, error) {
+	config, err := pgxpool.ParseConfig(databaseURL)
 	if err != nil {
 		return nil, fmt.Errorf("creating config ERR: %w", err)
 	}
@@ -95,7 +86,7 @@ func createStatus(ctx context.Context, status string, tx *pgx.Tx) error {
 }
 
 func (db *DataBase) initSchema(ctx context.Context) error {
-	content, err := os.ReadFile(initSQLPath)
+	content, err := os.ReadFile(os.Getenv("INITDB_PATH"))
 	if err != nil {
 		return fmt.Errorf("cannot read initdb.sql: %w", err)
 	}
