@@ -131,11 +131,18 @@ func createDepartment(
 	return id, nil
 }
 
-func departmentID(
+func (db *DataBase) DepartmentID(
 	ctx context.Context,
 	department string,
-	tx *pgx.Tx,
 ) (int, error) {
+
+	tx, err := db.Pool.BeginTx(ctx, pgx.TxOptions{
+		IsoLevel: pgx.Serializable,
+	})
+	if err != nil {
+		return 0, fmt.Errorf("starting transaction ERR: %w", err)
+	}
+	defer tx.Rollback(ctx)
 
 	query := `
 		SELECT id
@@ -143,7 +150,7 @@ func departmentID(
 		WHERE department = $1
 	`
 
-	rows, err := (*tx).Query(ctx, query, department)
+	rows, err := tx.Query(ctx, query, department)
 	if err != nil {
 		return 0, fmt.Errorf("receiving department ERR: %w", err)
 	}
@@ -168,14 +175,14 @@ func departmentID(
 	}
 
 	if id == 0 {
-		id, err = createDepartment(ctx, department, tx)
+		id, err = createDepartment(ctx, department, &tx)
 
 		if err != nil {
 			return 0, fmt.Errorf("creating department ERR: %w", err)
 		}
 	}
 
-	return id, nil
+	return id, tx.Commit(ctx)
 }
 
 func statusID(ctx context.Context, status string, db *DataBase) (int, error) {
@@ -285,7 +292,7 @@ func checkExistenceDepartment(
 func (db *DataBase) CreateEmployee(
 	ctx context.Context,
 	emp internal.Employee,
-	department string,
+	depID int,
 ) error {
 
 	pendingID, err := statusID(ctx, pending, db)
@@ -293,9 +300,7 @@ func (db *DataBase) CreateEmployee(
 		return err
 	}
 
-	tx, err := db.Pool.BeginTx(ctx, pgx.TxOptions{
-		IsoLevel: pgx.Serializable,
-	})
+	tx, err := db.Pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		return fmt.Errorf("starting transaction ERR: %w", err)
 	}
@@ -309,11 +314,6 @@ func (db *DataBase) CreateEmployee(
 
 	if exists {
 		return internal.EmployeeAlreadyExists
-	}
-
-	depID, err := departmentID(ctx, department, &tx)
-	if err != nil {
-		return err
 	}
 
 	query := `

@@ -4,6 +4,7 @@ import (
 	"context"
 	"employee/internal"
 	"employee/internal/repository"
+	"fmt"
 )
 
 type Service struct {
@@ -19,7 +20,13 @@ func NewService(db *repository.DataBase) *Service {
 func (s *Service) CreateEmployee(
 	ctx context.Context, emp internal.Employee, department string) error {
 
-	return s.db.CreateEmployee(ctx, emp, department)
+	depID, err := s.db.DepartmentID(ctx, department)
+
+	if err != nil {
+		return fmt.Errorf("create employee ERR:%s", err)
+	}
+
+	return s.db.CreateEmployee(ctx, emp, depID)
 }
 
 func (s *Service) EmployeesFromDepartment(
