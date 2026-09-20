@@ -453,7 +453,39 @@ func (db *DataBase) PendingEmployees(
 	return convertToEmployeesList(fullEmp), nil
 }
 
-func (db *DataBase) changeStatus(ctx context.Context, id int) error {
+func (db *DataBase) CheckPendingEmployees(
+	ctx context.Context,
+	pendingTimeInSeconds int,
+) ([]int, error) {
+	query := `
+		SELECT employee_id
+		FROM pending_employees 
+		WHERE creating_time < NOW() - $1 * INTERVAL '1 second'
+	`
+
+	rows, err := db.Pool.Query(ctx, query, pendingTimeInSeconds)
+	if err != nil {
+		return []int{}, fmt.Errorf("worker ERR: selecting employees ERR: %w", err)
+	}
+	defer rows.Close()
+
+	var checkedEmployees []int
+	for rows.Next() {
+		var id int
+
+		err := rows.Scan(&id)
+
+		if err != nil {
+			return []int{}, fmt.Errorf("worker ERR: scanning employees ERR: %w", err)
+		}
+
+		checkedEmployees = append(checkedEmployees, id)
+	}
+
+	return checkedEmployees, nil
+}
+
+func (db *DataBase) ChangeStatus(ctx context.Context, id int) error {
 	checkedID, err := statusID(ctx, checked, db)
 	if err != nil {
 		return err

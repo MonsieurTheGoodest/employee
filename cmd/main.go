@@ -25,15 +25,16 @@ func main() {
 
 	defer db.Close()
 
+	service := service.NewService(db)
+
 	go func() {
-		err := repository.Checking(db, cfg.CheckInterval, cfg.PendingTimeInSeconds)
+		err := service.Checking(cfg.CheckInterval, cfg.PendingTimeInSeconds)
 
 		if err != nil {
 			log.Print(err)
 		}
 	}()
 
-	service := service.NewService(db)
 	handler := handler.NewHandler(service)
 
 	mux := http.NewServeMux()
