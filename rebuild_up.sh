@@ -6,5 +6,5 @@ echo docker compose up
 
 docker compose down
 docker rmi employee:v01
-docker build -t  employee:v01 ./
+docker build -t employee:v01 ./
 docker compose up
