@@ -34,8 +34,8 @@ func checkExistenceDepartment(
 	}
 
 	if counter >= 2 {
-		return true, fmt.Errorf(`something went wrong: 
-				more than one department`)
+		return true, fmt.Errorf("something went wrong: " +
+			"more than one department")
 	}
 
 	return counter == 1, nil

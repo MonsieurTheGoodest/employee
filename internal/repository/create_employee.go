@@ -36,8 +36,8 @@ func checkExistenceEmployee(
 	}
 
 	if counter >= 2 {
-		return true, fmt.Errorf(`something went wrong: 
-				more than one employee with the same first and second names`)
+		return true, fmt.Errorf("something went wrong: " +
+			"more than one employee with the same first and second names")
 	}
 
 	return counter == 1, nil

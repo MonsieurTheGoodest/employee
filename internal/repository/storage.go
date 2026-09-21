@@ -103,8 +103,8 @@ func statusID(ctx context.Context, status string, db *DataBase) (int, error) {
 	var id int
 	for rows.Next() {
 		if id != 0 {
-			return 0, fmt.Errorf(`something went wrong:
-				more than one same statuses ERR`)
+			return 0, fmt.Errorf("something went wrong: " +
+				"more than one same statuses ERR")
 		}
 
 		err := rows.Scan(&id)

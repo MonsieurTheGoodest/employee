@@ -57,8 +57,8 @@ func (db *DataBase) DepartmentID(
 	var id int
 	for rows.Next() {
 		if id != 0 {
-			return 0, fmt.Errorf(`something went wrong:
-				more than one department ERR`)
+			return 0, fmt.Errorf("something went wrong: " +
+				"more than one department ERR")
 		}
 
 		err := rows.Scan(&id)
