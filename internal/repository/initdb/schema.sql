@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS statuses (
 
 CREATE TABLE IF NOT EXISTS departments (
     id SERIAL PRIMARY KEY,
-    department TEXT NOT NULL
+    department TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS employees (
@@ -26,6 +26,3 @@ CREATE TABLE IF NOT EXISTS pending_employees (
 
     CONSTRAINT employee_id_fk FOREIGN KEY (employee_id) REFERENCES employees (id)
 );
-
-CREATE INDEX IF NOT EXISTS department_idx
-ON departments USING HASH (department)

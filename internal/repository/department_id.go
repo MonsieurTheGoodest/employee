@@ -3,24 +3,23 @@ package repository
 import (
 	"context"
 	"fmt"
-
-	"github.com/jackc/pgx/v5"
 )
 
 func createDepartment(
 	ctx context.Context,
 	department string,
-	tx *pgx.Tx,
+	db *DataBase,
 ) (int, error) {
 
 	query := `
 		INSERT INTO departments (department)
 		VALUES ($1)
+		ON CONFLICT DO NOTHING
 		RETURNING id
 	`
 
 	var id int
-	err := (*tx).QueryRow(ctx, query, department).Scan(&id)
+	err := db.Pool.QueryRow(ctx, query, department).Scan(&id)
 
 	if err != nil {
 		return 0, fmt.Errorf("scanning department ERR: %w", err)
@@ -34,21 +33,13 @@ func (db *DataBase) DepartmentID(
 	department string,
 ) (int, error) {
 
-	tx, err := db.Pool.BeginTx(ctx, pgx.TxOptions{
-		IsoLevel: pgx.Serializable,
-	})
-	if err != nil {
-		return 0, fmt.Errorf("starting transaction ERR: %w", err)
-	}
-	defer tx.Rollback(ctx)
-
 	query := `
 		SELECT id
 		FROM departments
 		WHERE department = $1
 	`
 
-	rows, err := tx.Query(ctx, query, department)
+	rows, err := db.Pool.Query(ctx, query, department)
 	if err != nil {
 		return 0, fmt.Errorf("receiving department ERR: %w", err)
 	}
@@ -73,12 +64,12 @@ func (db *DataBase) DepartmentID(
 	}
 
 	if id == 0 {
-		id, err = createDepartment(ctx, department, &tx)
+		id, err = createDepartment(ctx, department, db)
 
 		if err != nil {
 			return 0, fmt.Errorf("creating department ERR: %w", err)
 		}
 	}
 
-	return id, tx.Commit(ctx)
+	return id, nil
 }
