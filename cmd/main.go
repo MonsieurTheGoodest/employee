@@ -27,8 +27,11 @@ func main() {
 
 	service := service.NewService(db)
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	go func() {
-		err := service.Checking(cfg.CheckInterval, cfg.PendingTimeInSeconds)
+		err := service.Checking(ctx, cfg.CheckInterval, cfg.PendingTimeInSeconds)
 
 		if err != nil {
 			log.Print(err)

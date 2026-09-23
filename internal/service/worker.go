@@ -7,14 +7,13 @@ import (
 )
 
 func (s *Service) Checking(
+	ctx context.Context,
 	checkInterval time.Duration,
 	pendingTimeInSeconds int,
 ) error {
 
-	ctx, cancel := context.WithCancel(context.Background())
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
-	defer cancel()
 
 	for {
 		select {
