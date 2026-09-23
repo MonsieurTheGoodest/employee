@@ -12,7 +12,7 @@ func (s *Service) Checking(
 	pendingTimeInSeconds int,
 ) error {
 
-	ticker := time.NewTicker(time.Second)
+	ticker := time.NewTicker(checkInterval)
 	defer ticker.Stop()
 
 	for {
