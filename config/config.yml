@@ -10,7 +10,7 @@ storage:
     db_name: postgres
     host: postgres
 
-pending_time_in_seconds: 10
+pending_time_in_seconds: 180
 check_interval: 5s
 close_server_time: 15s
 close_service_time: 5s
