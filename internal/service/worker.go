@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"time"
 )
 
@@ -21,13 +21,13 @@ func (s *Service) Checking(
 			checkedEmployees, err := s.db.CheckPendingEmployees(ctx, pendingTimeInSeconds)
 
 			if err != nil {
-				return fmt.Errorf("worker ERR: %w", err)
+				log.Printf("worker ERR: %s", err.Error())
 			}
 
 			if len(checkedEmployees) > 0 {
 				for _, emp := range checkedEmployees {
 					if err := s.db.ChangeStatus(ctx, emp); err != nil {
-						return fmt.Errorf("worker ERR: changing status of %v ERR: %w", emp, err)
+						log.Printf("worker ERR: changing status of %v ERR: %s", emp, err.Error())
 					}
 				}
 			}
