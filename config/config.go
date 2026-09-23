@@ -10,6 +10,8 @@ import (
 )
 
 type Config struct {
+	CloseServerTime      time.Duration `yaml:"close_server_time"`
+	CloseServiceTime     time.Duration `yaml:"close_service_time"`
 	PendingTimeInSeconds int           `yaml:"pending_time_in_seconds"`
 	CheckInterval        time.Duration `yaml:"check_interval"`
 	HTTPServer           `yaml:"http_server"`

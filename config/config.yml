@@ -12,3 +12,5 @@ storage:
 
 pending_time_in_seconds: 10
 check_interval: 5s
+close_server_time: 15s
+close_service_time: 5s
